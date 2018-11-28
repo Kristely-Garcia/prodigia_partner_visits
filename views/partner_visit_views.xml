@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="partner_visit_form_view">
+            <field name="name">partner_visit_form_view</field>
+            <field name="model">partner.visit</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <form string="Visitas">
+                <header>
+                    <button name="action_start" string="Iniciar"
+                        class="oe_highlight" type="object"
+                        states="nuevo"/>
+                    <button name="action_end" string="Terminar"
+                        class="oe_highlight" type="object"
+                        states="proceso"/>
+                    <button name="action_cancel" string="Cancelar"
+                        class="oe_highlight" type="object"
+                        groups="prodigia_partner_visits.partner_visit_admin"
+                        states="nuevo,proceso"/>
+                    <button name="action_reset" string="Reactivar"
+                        class="oe_highlight" type="object"
+                        groups="prodigia_partner_visits.partner_visit_admin"
+                        states="hecho,cancelado"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="nuevo,proceso,hecho"/>
+                </header>
+                <sheet string="Visitas" name='main_view'>
+                    <group string="Visitas">
+                        <h1><field name="name"/></h1>
+                    </group>
+
+                    <group colspan="4">
+                        <group col="2">
+                            <field name="partner_id"
+                                attrs="{'readonly':[('state','not in',['nuevo',])]}"/>
+                            <field name="user_id"
+                                attrs="{'readonly':[('state','not in',['nuevo',])]}"/>
+                            <field name="visit_type"
+                                attrs="{'readonly':[('state','not in',['nuevo',])]}"/>
+                        </group>
+                        <group col="2">
+                            <field name="date"/>
+                            <field name="end_date"/>
+                            <field name="visit_duration"/>
+                        </group>
+                    </group>
+
+                    <div string='Ubicacion'>
+                        <field name="partner_id_map" widget='g_map'/>
+                    </div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- VISTA DE LISTA -->
+        <record id="partner_visit_tree_view" model="ir.ui.view">
+            <field name="name">partner_visit_tree_view</field>
+            <field name="model">partner.visit</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <tree string="Visitas">
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="partner_id"/>
+                    <field name="visit_type"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- PIVOTE -->
+        <record id="partner_visit_pivot_view" model="ir.ui.view">
+            <field name="name">partner_visit_pivot_view</field>
+            <field name="model">partner.visit</field>
+            <field name="type">pivot</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <pivot string="Reporte de visitas">
+                    <field name="user_id" type="row"/>
+                    <field name="date" interval="month" type="col"/>
+                    <!-- <field name="unit_amount" type="measure" widget="float_time"/> -->
+                </pivot>
+            </field>
+        </record>
+
+        <!-- GRAFICA -->
+        <record id="partner_visit_graph_view" model="ir.ui.view">
+            <field name="name">partner_visit_graph_view</field>
+            <field name="model">partner.visit</field>
+            <field name="type">graph</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <graph string="Grafica de visitas" type="bar">
+                    <field name="user_id" type="row"/>
+                    <field name="date" interval="month" type="col"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- FILTROS -->
+        <record id="partner_visit_filter_view" model="ir.ui.view">
+            <field name="name">partner_visit_filter_view</field>
+            <field name="model">partner.visit</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date"/>
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="partner_id"/>
+                    <field name="visit_type"/>
+
+                    <group expand="0" string="Agrupar por..." >
+                        <filter string="Vendedor" icon="terp-personal" domain="[]" context="{'group_by':'user_id'}"/>
+                        <filter string="Empresa" icon="terp-personal" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Tipo" icon="terp-state" domain="[]" context="{'group_by':'visit_type'}"/>
+                        <filter string="Month" icon="terp-go-month" domain="[]" context="{'group_by':'create_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
+        <!-- ACCION -->
+        <!-- ACCION PARAS REQUERIMEINTO -->
+        <record id="partner_visit_action" model="ir.actions.act_window">
+            <field name="name">Visitas</field>
+            <field name="res_model">partner.visit</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph,pivot</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Registrar visita
+              </p>
+            </field>
+        </record>
+
+        <!-- MENUS -->
+        <menuitem name="Visitas" id="menu_partner_visit_submenu" parent="sale.sale_menu_root" sequence="5"/>
+        <menuitem name="Visitas a cliente" id="menu_partner_visit_action" parent="menu_partner_visit_submenu" action="partner_visit_action" sequence="1" />
+    </data>
+</odoo>

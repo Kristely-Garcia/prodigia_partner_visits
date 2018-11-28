@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="partner_visit_user" model="res.groups"> 
+            <field name="name">Registro de visitas</field>
+            <field name="category_id" ref="base.module_category_sales_management"/>
+        </record>
+        <record id="partner_visit_admin" model="res.groups"> 
+            <field name="name">Admin de visitas</field>
+            <field name="category_id" ref="base.module_category_sales_management"/>
+        </record>
+    </data>
+</openerp>

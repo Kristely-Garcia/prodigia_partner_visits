@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <odoo>
+    <data noupdate="1">
+
+        <record id="sequence_partner_visit" model="ir.sequence">
+            <field name="name">Secuencia visitas</field>
+            <field name="code">partner.visit</field>
+            <field name="prefix"></field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- PLANTILLAS DE CORREO -->
+        <record id="email_template_partner_visit" model="mail.template">
+            <field name="name">Email de Visita</field>
+            <field name="email_from">${(object.user_id.email and '&quot;%s&quot; &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="subject">Visita (${object.name or 'n/a'})</field>
+            <field name="partner_to">${object.get_emails()}</field>
+            <!-- <field name="partner_to">${object.partner_id.id}</field> -->
+            <field name="model_id" ref="prodigia_partner_visits.model_partner_visit"/>
+            <field name="auto_delete" eval="True"/>
+            <!-- <field name="report_template" ref="account_invoices"/> -->
+            <!-- <field name="report_name">Invoice_${(object.number or '').replace('/','_')}_${object.state == 'draft' and 'draft' or ''}</field> -->
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html" type="html">
+<div>
+<p>
+% set access_url = object.get_mail_url()
+Se ha registrado una visita a cliente:<br/>
+Vendedor: ${object.user_id.partner_id.name}<br/>
+Cliente: ${object.partner_id.name}<br/>
+</p>
+
+    <br/><br/>
+    <center>
+      <a href="${access_url}" style="background-color: #1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;" class="o_default_snippet_text">Ver Visita</a>
+    </center>
+    <br/><br/>
+
+</div></field>
+        </record>
+
+        <record id="email_template_partner_visit_end" model="mail.template">
+            <field name="name">Email de Finalizacion de Visita</field>
+            <field name="email_from">${(object.user_id.email and '&quot;%s&quot; &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="subject">Visita (${object.name or 'n/a'})</field>
+            <field name="partner_to">${object.get_emails()}</field>
+            <!-- <field name="partner_to">${object.partner_id.id}</field> -->
+            <field name="model_id" ref="prodigia_partner_visits.model_partner_visit"/>
+            <field name="auto_delete" eval="True"/>
+            <!-- <field name="report_template" ref="account_invoices"/> -->
+            <!-- <field name="report_name">Invoice_${(object.number or '').replace('/','_')}_${object.state == 'draft' and 'draft' or ''}</field> -->
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html" type="html">
+<div>
+<p>
+% set access_url = object.get_mail_url()
+Se ha finalizado una visita a cliente:<br/>
+Vendedor: ${object.user_id.partner_id.name}<br/>
+Cliente: ${object.partner_id.name}<br/>
+</p>
+
+    <br/><br/>
+    <center>
+      <a href="${access_url}" style="background-color: #1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;" class="o_default_snippet_text">Ver Visita</a>
+    </center>
+    <br/><br/>
+
+</div></field>
+        </record>
+        
+    </data>
+</odoo>

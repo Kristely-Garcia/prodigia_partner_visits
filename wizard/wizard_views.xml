@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="visit_user_report_wizard_view" model="ir.ui.view">
+            <field name="name">visit_user_report_wizard_view</field>
+            <field name="model">partner.visit.wizard</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                    <sheet>
+                        <group colspan='4'>
+                            <group col='2'>
+                                <field name="start_date" />
+                                <field name="end_date" />
+                            </group>
+                            <group col='2'>
+                                <field name="partner_id" />
+                                <field name="user_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <center>
+                            <button name="button_generate" string="Generar" type="object"  />
+                            o
+                            <button string="Cerrar" class="oe_link" special="cancel" />
+                        </center>
+                    </footer>
+
+                </form>
+            </field>
+        </record>
+
+
+
+        <!-- ACCION PARA WIZARD -->
+        <act_window name="Reporte de visitas"
+            res_model="partner.visit.wizard"
+            src_model="partner.visit.wizard"
+            view_mode="form" target="new"
+            key2="client_action_multi"
+            id="action_visit_user_report_wizard"/>
+
+
+        <!-- MENUS -->
+        <menuitem name="Reporte de visitas" id="action_visit_user_report_wizard_menu" parent="menu_partner_visit_submenu" action="action_visit_user_report_wizard" sequence="2" />
+
+
+    </data>
+</openerp>

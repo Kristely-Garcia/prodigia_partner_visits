@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_google_maps_widget_config_settings" model="ir.ui.view">
+        <field name="name">view_google_maps_widget_config_settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='integration']" position="after">
+                <div name="web_google_maps">
+                    <h2>Google Maps Widget</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label string="Configurar Google Maps widget"/>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <label for="g_map_widget_api_key" string="Api key"/>
+                                        <field name="g_map_widget_api_key"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

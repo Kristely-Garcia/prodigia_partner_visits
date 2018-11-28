@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <!-- Layout and common templates -->
+    <!-- AIzaSyA7TGLsG61UcLlLb8XT8kqaZI97cqo5xRI -->
+    <template id="prodigia_partner_visits.assets_gmaps">
+        <t t-set="google_maps_api_key" t-value="request.env['ir.config_parameter'].sudo().get_param('google.api_key_geocode')"/>
+        <t t-if="google_maps_api_key">
+            <script t-att-async="'async'" t-att-defer="'defer'" t-attf-src="https://maps.googleapis.com/maps/api/js?v=3.33&amp;key=#{google_maps_api_key}"></script>
+        </t>
+        <t t-if="not google_maps_api_key">
+            <script t-att-async="'async'" t-att-defer="'defer'" t-attf-src="https://maps.googleapis.com/maps/api/js?v=3.33"></script>
+        </t>
+    </template>
+    
+    <template id="webclient_bootstrap" name="webclient_bootstrap_gmaps" inherit_id="web.webclient_bootstrap">
+        <xpath expr="//t[@t-call-assets='web.assets_common']" position="before">
+            <t t-call="prodigia_partner_visits.assets_gmaps"/>
+        </xpath>
+    </template>
+
+    <template id="assets_backend" inherit_id="web.assets_backend"> 
+        <xpath expr="." position="inside"> 
+            <link
+                href="/prodigia_partner_visits/static/src/css/widget.css"
+                rel="stylesheet" type="text/css"
+            /> 
+            <script
+                src="/prodigia_partner_visits/static/src/js/widget.js"
+                type="text/javascript"
+            /> 
+        </xpath> 
+    </template> 
+</odoo>

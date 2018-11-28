@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="visit_user_report_form_view">
+            <field name="name">visit_user_report_form_view</field>
+            <field name="model">visit.user.report</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <form string="Visitas" create="false" edit="false">
+                <sheet string="Visitas" name='main_view'>
+                    <h1><field name="name" readonly='1'/></h1>
+
+                    <group colspan="4">
+                        <group col="2">
+                            <field name="partner_id" readonly='1'/>
+                            <field name="user_id" readonly='1'/>
+                            <field name="total_visits" readonly='1'/>
+                        </group>
+                        <group col="2">
+                            <field name="start_date" readonly='1'/>
+                            <field name="end_date" readonly='1'/>
+                            <field name="total_partners" readonly='1'/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Visitas">
+                            <field name="line_ids" readonly='1'>
+                                <tree string="Visitas">
+                                    <field name="date"/>
+                                    <field name="end_date"/>
+                                    <field name="visit_duration"/>
+                                    <field name="name"/>
+                                    <field name="user_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="visit_type"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Mapa">
+                            <field name="gmap" widget='g_map' readonly='1'/>
+                        </page>
+                    </notebook>
+                </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_visit_user_report">
+            <field name="name">action_visit_user_report</field>
+            <field name="res_model">visit.user.report</field>
+            <field name="view_mode">form</field>
+            <!-- <field name="view_id" ref='prodigia_partner_visits.visit_user_report_form_view'/> -->
+        </record>
+
+    </data>
+</odoo>
