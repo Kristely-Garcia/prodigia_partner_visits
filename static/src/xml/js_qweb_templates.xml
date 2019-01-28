@@ -4,17 +4,25 @@
       <div id="map" style="width: 1000px; height: 800px;">
         <div id="map-canvas" style="width: 1000px; height: 800px;"/>
       </div>
-      <!-- <t t-foreach="widget.user_list" t-as="user_id"> 
-        <button
-          t-att-disabled=
-              "widget.mode == 'readonly' ? 'disabled' : False"
-          t-att-data-id="user_id"
-          t-attf-class="btn btn-default btn-sm 
-          {{(widget.value and widget.value.res_id == user_id) and 
-                                               'btn-primary' or ''}}"> 
-            <t t-esc="widget.user_list[user_id].name" /> 
-        </button> 
-      </t>  -->
     </div> 
   </t> 
+  <!-- template para boton de comenzar visita -->
+  <t t-name="VisitButtons">
+    <t t-if="state === 'nuevo'">
+        <button
+          class="btn btn-xs btn-primary js_get_current_location pull-left"
+          t-att-visit-id="visit_id"
+          style="margin-top:5px; margin-bottom:5px;">
+          Comenzar Visita
+        </button>
+    </t>
+    <t t-if="state === 'proceso'">
+        <button
+          class="btn btn-xs btn-primary js_get_current_location2 pull-left"
+          t-att-visit-id="visit_id"
+          style="margin-top:5px; margin-bottom:5px;">
+          Finalizar Visita
+        </button>
+    </t>
+  </t>
 </templates>

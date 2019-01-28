@@ -4,11 +4,18 @@ from odoo.exceptions import UserError, RedirectWarning, ValidationError
 
 from datetime import datetime, timedelta
 
+#import geocoder
+# g = geocoder.ip('me')
+# print(g.latlng)
+
 class PartnerVisit(models.Model):
     _name = 'partner.visit'
     _description = 'Visita'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
 
+    ###########################################
+    #FUNCIONES PARA ENVIO DE CORREO
+    ###########################################
     def get_mail_url(self):
         return self.get_share_url()
 
@@ -38,13 +45,73 @@ class PartnerVisit(models.Model):
             template.send_mail(self.id, force_send=True)
 
     ###########################################
+    #FUNCIONES QUE SE LLAMAN DESDE JS
+    ###########################################
+    def visit_start(self):
+        print('visit_start ',self)
+        print('self.env.context: ',self.env.context)
+        user = self.env.user
+        print('user: ',user)
+        user_id = self.env.context.get('user_id')
+        lat = self.env.context.get('lat')
+        lng = self.env.context.get('lng')
+        print(lat,', ',lng)
+        self.check_coordinates(lat, lng) 
+
+        vals = {'lat1':lat,'lng1':lng,}
+        return self.action_start(vals)
+
+    def visit_end(self):
+        print('visit_end ',self)
+        print('self.env.context: ',self.env.context)
+        user = self.env.user
+        print('user: ',user)
+        user_id = self.env.context.get('user_id')
+        lat = self.env.context.get('lat')
+        lng = self.env.context.get('lng')
+        distance = self.env.context.get('distance')
+        self.check_coordinates(lat, lng)        
+        vals = {'lat2':lat,'lng2':lng,'distance':distance,}
+        return self.action_end(vals)
+
+    def check_coordinates(self, lat, lng):
+        """
+        revisa las coordenadas
+        y verifica que sean validas
+        """
+        if not lat or not lng:
+            msg = """No se puede obtener ubicacion!!, 
+            intente desde un dispositivo mobil, 
+            o activando las funciones de localizacion en su navegador"""
+            raise UserError(msg)
+        return True
+
+
+    ###########################################
     #FUNCIONES DE CAMPOS COMPUTADOS
     ###########################################
+    @api.multi
+    @api.depends('distance')
+    def _calculate_discrepancy(self):
+        """
+        si la distancia entre los 2 puntos
+        es mayor a una cantidad definida
+        se tomara como que existe discrepancia en la visita
+        """
+        print('_calculate_discrepancy')
+        treshold_distance = 50
+        for rec in self:
+            if rec.distance > treshold_distance:
+                rec.point_discrepancy = True
+
     @api.multi
     def _compute_partner_id_map(self):
         """
         OBTIENE ID DEL PARTNER
         """
+        # print('_compute_partner_id_map')
+        # g = geocoder.ip('me')
+        # print(g.latlng)
         for rec in self:
             if rec.partner_id:
                 rec.partner_id_map = rec.partner_id.id
@@ -79,18 +146,27 @@ class PartnerVisit(models.Model):
     #METODOS DE FLUJO
     ###########################################
     @api.multi
-    def action_start(self):
-        vals = {}
+    def action_start(self, vals):
+        """
+        se llama desde metodo js
+        vals contendra lat1 y lng1
+        """
+        #vals = {}
         vals['date'] = datetime.now()
         vals['state'] = 'proceso'
         self.write(vals)
         self.semd_email('start')
 
     @api.multi
-    def action_end(self):
-        vals = {}
+    def action_end(self, vals):
+        """
+        se llama desde metodo js
+        vals contendra lat2 y lng2
+        """
+        #vals = {}
         vals['end_date'] = datetime.now()
         vals['state'] = 'hecho'
+        print('vals: ',vals)
         self.write(vals)
         self.semd_email('end')
 
@@ -108,6 +184,12 @@ class PartnerVisit(models.Model):
         vals['date'] = False
         vals['end_date'] = False
         vals['state'] = 'nuevo'
+
+        #se resetean las coordenadas
+        vals['lat1'] = 0.0
+        vals['lng1'] = 0.0
+        vals['lat2'] = 0.0
+        vals['lng2'] = 0.0
         self.write(vals)
 
     ###########################################
@@ -151,3 +233,16 @@ class PartnerVisit(models.Model):
         ('cancelado','Cancelada')
         ],string='Etapa',required=True,default='nuevo',track_visibility='onchange')
     #html_map = fields.Char(string='Ubicacion',compute='_compute_html_map')
+    #usado para botones js
+    begin_visit_button_widget = fields.Char(string="Registro de visita")
+
+
+    #datos de comienzo de visita
+    lat1 = fields.Float(string="latitud1", digits=(6,6))
+    lng1 = fields.Float(string="longitud1", digits=(6,6))
+
+    #datos de termino de visita
+    lat2 = fields.Float(string="latitud2", digits=(6,6))
+    lng2 = fields.Float(string="longitud2", digits=(6,6))
+    distance = fields.Float(string="Distancia entre puntos (m)",)
+    point_discrepancy = fields.Boolean(string="Discrepancia",calculate="_calculate_discrepancy",store=True)

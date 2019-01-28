@@ -33,6 +33,7 @@
                                     <field name="user_id"/>
                                     <field name="partner_id"/>
                                     <field name="visit_type"/>
+                                    <field name="point_discrepancy"/>
                                 </tree>
                             </field>
                         </page>

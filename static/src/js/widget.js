@@ -4,7 +4,7 @@ EN MAPA
 LEE LA LAT Y LONG REGISTRADOS EN EL PARTNER
 Y CREA UN MARCADOR
 */
-odoo.define('prodigia_gmap_widget.gmap_widget', function(require){ 
+odoo.define('prodigia_partner_visits.gmap_widget', function(require){ 
     var registry = require('web.field_registry'), 
     AbstractField = require('web.AbstractField');
 
