@@ -146,18 +146,25 @@ var LocationButtonsWidget = AbstractField.extend({
         return pos;*/
 
         try {
+            var pos;
             console.log("obtener coordenadas de navegador...");
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var pos = {
-                      lat: position.coords.latitude,
-                      lng: position.coords.longitude
+                console.log("zzzz");
+                pos = navigator.geolocation.getCurrentPosition(function(position) {
+                    console.log("wwwww");
+                    pos = {
+                        /*lat: position.coords.latitude,
+                        lng: position.coords.longitude*/
+                        lat: 29.09737,
+                        lng: -111.02102
                     };
-                    //console.log("pos: "+pos);
+                    console.log("pos1111: "+pos);
                     return pos;
                 });
-                
+                console.log("pos22222: "+pos);
             }
+            console.log("pos333: "+pos);
+            return pos;
         }
         catch(err) {
             alert("Es necesario activar permisos de ubicacion en su navegador!");
