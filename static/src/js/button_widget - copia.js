@@ -60,75 +60,75 @@ var LocationButtonsWidget = AbstractField.extend({
             //this.res_id es el id del record actual
             visit_id: this.res_id,
             state: this.recordData['state']
-        })); 
+        }));
         //se agrega evento a boton
         //$el representa el root element html
         //find es una funcion jquery que sirve para seleccionar un elemento html
-        this.$el.find('.js_get_current_location').on('click', self._onClickButton.bind(self));
-        this.$el.find('.js_get_current_location2').on('click', self._onClickButton.bind(self));
+        this.$el.find('.js_get_current_location').on('click', self._onVisit.bind(self));
+        this.$el.find('.js_get_current_location2').on('click', self._onVisit.bind(self));
     },
     //render end
 
     //--------------------------------------------------------------------------
     // Handlers
     //--------------------------------------------------------------------------
-    _onClickButton: function (event) {
-        console.log("_onClickButton");
+
+    /**
+     * @private
+     * @override
+     * @param {MouseEvent} event
+     funcion evento inicio de visita
+     */
+    _onVisit: function (event) {
+        console.log("_onVisit");
         var self = this;
+        var visitId = this.res_id;
+        var state = this.recordData['state'];
+        var odoo_method;
 
-        self._getLocation(function (pos) {
-            console.log("_onVisit");
-            var self = this;
-            var visitId = this.res_id;
-            var state = this.recordData['state'];
-            var odoo_method;
+        //se obtiene punto actual (lat, lng)
+        var pos = self._getLocation();
+        var distance = 0.0;
+        console.log('pos: '+pos);
+        console.log('distance: '+distance);
 
-            //se obtiene punto actual (lat, lng)
-            //var pos = self._getLocation();
-            var distance = 0.0;
-            console.log('pos: '+pos);
-            console.log('distance: '+distance);
+        if (state == 'nuevo') {
+            odoo_method = 'visit_start';
+        } else {
+            odoo_method = 'visit_end';
 
-            if (state == 'nuevo') {
-                odoo_method = 'visit_start';
-            } else {
-                odoo_method = 'visit_end';
+            //se obtiene posicion de incicio de visita:
+            var lat1 = this.recordData['lat1'];
+            var lng1 = this.recordData['lng1'];
+            var pos1 = {lat: lat1, lng: lng1}
+            //si es el boton de finalizar, se calcula distancia entre
+            //los el punto inicial y final
+            distance =  self._getDistance(pos,pos1);
+        }
 
-                //se obtiene posicion de incicio de visita:
-                var lat1 = this.recordData['lat1'];
-                var lng1 = this.recordData['lng1'];
-                var pos1 = {lat: lat1, lng: lng1}
-                //si es el boton de finalizar, se calcula distancia entre
-                //los el punto inicial y final
-                distance =  self._getDistance(pos,pos1);
-            }
-
-            /*
-            this._rpc realiza una llamada a python
-            para ejecutar un metodo, atributos:
-            -model: modelo de odoo
-            -method: metodo a ejecutar
-            */
-            try{
-                this._rpc({
-                    model: 'partner.visit',
-                    method: odoo_method,
-                    //en args, el primer argumento equivale a self en python, por lo que tiene que ser el id
-                    //el segundo argumento es el contexto que se debera sacar con self.env.context
-                    args: [this.res_id,{'lat': pos.lat,'lng': pos.lng,'distance': distance}]
-                }).then(function () {
-                    //desencadena una recarga de pagina
-                    self.trigger_up('reload');
-                });
-            }catch(err) {
-                alert("Es necesario activar permisos de ubicacion en su navegador!");
-            }
+        /*
+        this._rpc realiza una llamada a python
+        para ejecutar un metodo, atributos:
+        -model: modelo de odoo
+        -method: metodo a ejecutar
+        */
+        try{
+            this._rpc({
+                model: 'partner.visit',
+                method: odoo_method,
+                //en args, el primer argumento equivale a self en python, por lo que tiene que ser el id
+                //el segundo argumento es el contexto que se debera sacar con self.env.context
+                args: [this.res_id,{'lat': pos.lat,'lng': pos.lng,'distance': distance}]
+            }).then(function () {
+                //desencadena una recarga de pagina
+                self.trigger_up('reload');
+            });
+        }catch(err) {
+            alert("Es necesario activar permisos de ubicacion en su navegador!");
+        }
 
 
-        }); //end of callback
-        console.log("END")
     },
-
 
     //--------------------------------------------------------------------------
     // Other functions
@@ -137,8 +137,8 @@ var LocationButtonsWidget = AbstractField.extend({
     /*
     Obtiene lattitud y longitud del navegador
     */
-    _getLocation: function (callback) {
-        console.log("_getLocation");
+    _getLocation: function () {
+        console.log("_getLocation")
         /*var pos = {
           lat: 29.09737,
           lng: -111.02102
@@ -146,31 +146,31 @@ var LocationButtonsWidget = AbstractField.extend({
         return pos;*/
 
         try {
+            var pos;
             console.log("obtener coordenadas de navegador...");
-            //if (navigator.geolocation) {
-            console.log("aaaa");
-            navigator.geolocation.getCurrentPosition(function(position) {
+            if (navigator.geolocation) {
                 console.log("wwwww");
-                pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                    /*lat: 29.09737,
-                    lng: -111.02102*/
-                };
-                console.log("pos1111: "+pos);
-                callback(pos)
-                console.log("end callback");
-                //return pos;
-            });
-            //}
+                pos = navigator.geolocation.getCurrentPosition(function(position) {
+                    console.log("wwwww");
+                    pos = {
+                        /*lat: position.coords.latitude,
+                        lng: position.coords.longitude*/
+                        lat: 29.09737,
+                        lng: -111.02102
+                    };
+                    console.log("pos1111: "+pos);
+                    return pos;
+                });
+                console.log("pos22222: "+pos);
+            }
+            console.log("pos333: "+pos);
+            return pos;
         }
         catch(err) {
             alert("Es necesario activar permisos de ubicacion en su navegador!");
         }
 
     }, // _getLocation end
-
-
 
     _rad: function(x) {
         /*
