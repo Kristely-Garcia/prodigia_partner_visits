@@ -74,13 +74,14 @@ var LocationButtonsWidget = AbstractField.extend({
     //--------------------------------------------------------------------------
     _onClickButton: function (event) {
         console.log("_onClickButton");
-        var self = this;
+        //var self = this;
 
-        self._getLocation(function (pos) {
+        this._getLocation(function (pos,self) {
             console.log("_onVisit");
-            var self = this;
-            var visitId = this.res_id;
-            var state = this.recordData['state'];
+            console.log(self);
+            //var self = this;
+            var visitId = self.res_id;
+            var state = self.recordData['state'];
             var odoo_method;
 
             //se obtiene punto actual (lat, lng)
@@ -95,8 +96,8 @@ var LocationButtonsWidget = AbstractField.extend({
                 odoo_method = 'visit_end';
 
                 //se obtiene posicion de incicio de visita:
-                var lat1 = this.recordData['lat1'];
-                var lng1 = this.recordData['lng1'];
+                var lat1 = self.recordData['lat1'];
+                var lng1 = self.recordData['lng1'];
                 var pos1 = {lat: lat1, lng: lng1}
                 //si es el boton de finalizar, se calcula distancia entre
                 //los el punto inicial y final
@@ -109,13 +110,14 @@ var LocationButtonsWidget = AbstractField.extend({
             -model: modelo de odoo
             -method: metodo a ejecutar
             */
+            console.log('!!!!');
             try{
-                this._rpc({
+                self._rpc({
                     model: 'partner.visit',
                     method: odoo_method,
                     //en args, el primer argumento equivale a self en python, por lo que tiene que ser el id
                     //el segundo argumento es el contexto que se debera sacar con self.env.context
-                    args: [this.res_id,{'lat': pos.lat,'lng': pos.lng,'distance': distance}]
+                    args: [self.res_id,{'lat': pos.lat,'lng': pos.lng,'distance': distance}]
                 }).then(function () {
                     //desencadena una recarga de pagina
                     self.trigger_up('reload');
@@ -125,7 +127,7 @@ var LocationButtonsWidget = AbstractField.extend({
             }
 
 
-        }); //end of callback
+        },this); //end of callback
         console.log("END")
     },
 
@@ -137,13 +139,16 @@ var LocationButtonsWidget = AbstractField.extend({
     /*
     Obtiene lattitud y longitud del navegador
     */
-    _getLocation: function (callback) {
+    _getLocation: function (callback,self) {
         console.log("_getLocation");
         /*var pos = {
           lat: 29.09737,
           lng: -111.02102
         };
-        return pos;*/
+        callback(pos,self);*/
+
+        /*lat: 29.09737,
+        lng: -111.02102*/
 
         try {
             console.log("obtener coordenadas de navegador...");
@@ -154,11 +159,9 @@ var LocationButtonsWidget = AbstractField.extend({
                 var pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
-                    /*lat: 29.09737,
-                    lng: -111.02102*/
                 };
                 console.log("pos1111: "+pos);
-                callback(pos)
+                callback(pos,self);
                 console.log("end callback");
                 //return pos;
             });
