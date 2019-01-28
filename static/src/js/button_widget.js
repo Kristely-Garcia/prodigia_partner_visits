@@ -151,7 +151,7 @@ var LocationButtonsWidget = AbstractField.extend({
             console.log("aaaa");
             navigator.geolocation.getCurrentPosition(function(position) {
                 console.log("wwwww");
-                pos = {
+                var pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                     /*lat: 29.09737,
