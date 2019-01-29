@@ -83,7 +83,7 @@ var LocationButtonsWidget = AbstractField.extend({
 
         this._getLocation(function (pos,self) {
             console.log("_onVisit");
-            console.log(self);
+            //console.log(self);
             //var self = this;
             var visitId = self.res_id;
             var state = self.recordData['state'];
@@ -92,21 +92,33 @@ var LocationButtonsWidget = AbstractField.extend({
             //se obtiene punto actual (lat, lng)
             //var pos = self._getLocation();
             var distance = 0.0;
+            var distance2 = 0.0;
+            var distance3 = 0.0;
+
             console.log('pos: '+pos);
-            console.log('distance: '+distance);
 
             if (state == 'nuevo') {
                 odoo_method = 'visit_start';
             } else {
                 odoo_method = 'visit_end';
+                //se obtiene posicion de cliente:
+                var lat_partner = self.recordData['lat_partner'];
+                var lng_partner = self.recordData['lng_partner'];
+                var pos_partner = {lat: lat_partner, lng: lng_partner};
 
                 //se obtiene posicion de incicio de visita:
                 var lat1 = self.recordData['lat1'];
                 var lng1 = self.recordData['lng1'];
-                var pos1 = {lat: lat1, lng: lng1}
+                var pos1 = {lat: lat1, lng: lng1};
                 //si es el boton de finalizar, se calcula distancia entre
                 //los el punto inicial y final
                 distance =  self._getDistance(pos,pos1);
+
+                //distancia de punto de inicia a punto de partner
+                distance2 =  self._getDistance(pos_partner,pos1);
+
+                //distancia de punto final a punto de partner
+                distance3 =  self._getDistance(pos_partner,pos);
             }
 
             /*
@@ -115,14 +127,13 @@ var LocationButtonsWidget = AbstractField.extend({
             -model: modelo de odoo
             -method: metodo a ejecutar
             */
-            console.log('!!!!');
             try{
                 self._rpc({
                     model: 'partner.visit',
                     method: odoo_method,
                     //en args, el primer argumento equivale a self en python, por lo que tiene que ser el id
                     //el segundo argumento es el contexto que se debera sacar con self.env.context
-                    args: [self.res_id,{'lat': pos.lat,'lng': pos.lng,'distance': distance}]
+                    args: [self.res_id,{'lat':pos.lat,'lng':pos.lng,'distance':distance,'distance2':distance2,'distance3':distance3}]
                 }).then(function () {
                     //desencadena una recarga de pagina
                     self.trigger_up('reload');
@@ -148,7 +159,7 @@ var LocationButtonsWidget = AbstractField.extend({
         console.log("_getLocation");
         /*var pos = {
           lat: 29.09737,
-          lng: -111.02102
+          lng: -112.02102
         };
         callback(pos,self);
         return true;*/
@@ -158,14 +169,11 @@ var LocationButtonsWidget = AbstractField.extend({
         try {
             console.log("obtener coordenadas de navegador...");
             //if (navigator.geolocation) {
-            console.log("aaaa");
             navigator.geolocation.getCurrentPosition(function(position) {
-                console.log("wwwww");
                 var pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-                console.log("pos1111: "+pos);
                 callback(pos,self);
                 console.log("end callback");
                 //return pos;

@@ -72,9 +72,16 @@ class PartnerVisit(models.Model):
         lat = self.env.context.get('lat')
         lng = self.env.context.get('lng')
         distance = self.env.context.get('distance')
+        distance2 = self.env.context.get('distance2')
+        distance3 = self.env.context.get('distance3')
         self.check_user()
         self.check_coordinates(lat, lng)        
-        vals = {'lat2':lat,'lng2':lng,'distance':distance,}
+        vals = {'lat2':lat,
+                'lng2':lng,
+                'distance':distance,
+                'distance2':distance2,
+                'distance3':distance3,
+                }
         return self.action_end(vals)
 
     def check_coordinates(self, lat, lng):
@@ -105,6 +112,19 @@ class PartnerVisit(models.Model):
             raise UserError(msg)
         return True
 
+    ###########################################
+    #FUNCIONES CONSTRAIN
+    ###########################################
+    @api.constrains('lat_partner', 'lng_partner')
+    def _check_partner_location(self):
+        print('_check_partner_location')
+        """
+        verifica que la lat y lng del partner no sean 0
+        """
+        self.ensure_one()
+        if not self.lat_partner and not self.lng_partner:
+            raise ValidationError("Verifique que el cliente tenga una latitud y longitud definida!")
+
 
     ###########################################
     #FUNCIONES DE CAMPOS COMPUTADOS
@@ -127,10 +147,10 @@ class PartnerVisit(models.Model):
                 rec.lng_partner = False
 
     @api.multi
-    @api.depends('distance')
+    @api.depends('distance','distance2','distance3')
     def _calculate_discrepancy(self):
         """
-        si la distancia entre los 2 puntos
+        si la distancias entre los 2 puntos (inicio,fin, cliente)
         es mayor a una cantidad definida
         se tomara como que existe discrepancia en la visita
         """
@@ -138,7 +158,10 @@ class PartnerVisit(models.Model):
         #treshold_distance = 50
         for rec in self:
             distance_treshold = rec.company_id and rec.company_id.distance_treshold or 50
-            if rec.distance > distance_treshold and rec.state not in ('nuevo'):
+            if ((rec.distance > distance_treshold) or\
+                (rec.distance2 > distance_treshold) or\
+                (rec.distance3 > distance_treshold))\
+                and rec.state not in ('nuevo'):
                 rec.point_discrepancy = True
 
     @api.multi
@@ -331,7 +354,9 @@ class PartnerVisit(models.Model):
         track_visibility='onchange')
     lng2 = fields.Float(string="longitud2",
         digits=(6,6),track_visibility='onchange')
-    distance = fields.Float(string="Distancia entre puntos (m)",)
+    distance = fields.Float(string="Distancia entre inicio y fin (m)",)
+    distance2 = fields.Float(string="Distancia inicio - cliente (m)",)
+    distance3 = fields.Float(string="Distancia fin - cliente (m)",)
     point_discrepancy = fields.Boolean(string="Discrepancia",
         compute="_calculate_discrepancy",
         store=True)

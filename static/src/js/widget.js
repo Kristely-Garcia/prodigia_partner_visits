@@ -76,7 +76,7 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
                     position: partnerLatLng,
                     title: partner_title
                   });
-                  partner_marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+                  partner_marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red-dot.png');
                 }
 
                 //punto inicio de visita
@@ -89,7 +89,7 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
                     position: myLatLng1,
                     title: String(titulo_inicio)
                   });
-                  marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+                  marker.setIcon('https://maps.google.com/mapfiles/ms/icons/green-dot.png');
                 }
                 
                 //punto final
@@ -102,7 +102,7 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
                     position: myLatLng2,
                     title: titulo_fin
                   });
-                  marker2.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
+                  marker2.setIcon('https://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
                 }
                 
               }

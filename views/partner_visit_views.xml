@@ -56,6 +56,10 @@
                             <group>
                                 <field name="distance"
                                     attrs="{'readonly':[('state','in',['hecho','cancelado'])], 'invisible':[('state','not in',['hecho','cancelado'])]}"/>
+                                <field name="distance2"
+                                    attrs="{'readonly':[('state','in',['hecho','cancelado'])], 'invisible':[('state','not in',['hecho','cancelado'])]}"/>
+                                <field name="distance3"
+                                    attrs="{'readonly':[('state','in',['hecho','cancelado'])], 'invisible':[('state','not in',['hecho','cancelado'])]}"/>
                             </group>
 
                             <group colspan="4">
