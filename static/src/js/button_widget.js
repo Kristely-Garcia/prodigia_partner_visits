@@ -146,12 +146,12 @@ var LocationButtonsWidget = AbstractField.extend({
     */
     _getLocation: function (callback,self) {
         console.log("_getLocation");
-        /*var pos = {
+        var pos = {
           lat: 29.09737,
           lng: -111.02102
         };
         callback(pos,self);
-        return true;*/
+        return true;
         /*lat: 29.09737,
         lng: -111.02102*/
 

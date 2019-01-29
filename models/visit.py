@@ -97,8 +97,9 @@ class PartnerVisit(models.Model):
         de la misma
         """
         user = self.env.user
-        print('user: ',user)
-        if not user.id == self.user_id:
+        print('user: ',user.id)
+        print('self.user_id: ',self.user_id.id)
+        if not user.id == self.user_id.id:
             msg = """Solo el usuario registrado como responsable puede iniciar o finalizar
             la visita!"""
             raise UserError(msg)
