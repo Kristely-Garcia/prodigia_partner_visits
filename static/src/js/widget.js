@@ -26,11 +26,16 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
                 domain = [['id','=',visit_id]];
               break;
             default:
-                var visit_ids = this.recordData.line_ids.res_ids;
-                /*var partner_ids = [];
+                
+                var visit_ids = [];
+                var line_ids = this.recordData.line_ids.data;
+                //var partner_ids = [];
                 for(var x=0;x<line_ids.length;x++){
-                  partner_ids.push(line_ids[x].data.partner_id.data.id)
-                }*/
+                  console.log(line_ids[x].data);
+                  console.log(line_ids[x].data.name);
+                  visit_ids.push(line_ids[x].data.name);
+                }
+                console.log("visit_ids: "+visit_ids)
                 domain = [['id','in',visit_ids]];
               break;
           }
@@ -44,6 +49,7 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
           { 
               // Create a map object and specify the DOM element
               // for display.
+              console.log("222222222222")
               var map = new google.maps.Map(map_canvas, {
                 center: {lat: 29.0894152,lng: -110.9612378},
                 zoom: 13
@@ -68,39 +74,45 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
                 var myLatLng2 = {lat: lat2, lng: lng2};
 
                 //punto inicio de visita
+                console.log("partner_display_name "+partner_display_name);
                 if(partner_display_name != "false"){
+                  console.log("333333");
                   var partner_marker;
-                  var partner_title = "Visita: "+visit+"\nCliente: "+partner_display_name;
+                  //var partner_title = "Visita: "+visit+"\nCliente: "+partner_display_name;
                   partner_marker = new google.maps.Marker({
                     map: map,
                     position: partnerLatLng,
-                    title: partner_title
+                    //title: partner_title
                   });
                   partner_marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red-dot.png');
                 }
 
                 //punto inicio de visita
+                console.log("date "+date);
                 if(date != "false"){
-                  var titulo_inicio = "Visita: "+visit+"\nInicio de visita: "+date+"\nCliente: "+partner_display_name;
+                  console.log("44444");
+                  //var titulo_inicio = "Visita: "+visit+"\nInicio de visita: "+date+"\nCliente: "+partner_display_name;
                   var marker;
                   console.log(typeof  titulo_inicio);
                   marker = new google.maps.Marker({
                     map: map,
                     position: myLatLng1,
-                    title: String(titulo_inicio)
+                    //title: String(titulo_inicio)
                   });
                   marker.setIcon('https://maps.google.com/mapfiles/ms/icons/green-dot.png');
                 }
                 
                 //punto final
+                console.log("end_date "+end_date);
                 if(end_date != "false"){
+                  console.log("55555");
                   var marker2;
-                  var titulo_fin = "Visita: "+visit+"\nFin de visita: "+date+"\nCliente: "+partner_display_name+"\nDuracion: "+visit_duration+" mins.";
+                  //var titulo_fin = "Visita: "+visit+"\nFin de visita: "+date+"\nCliente: "+partner_display_name+"\nDuracion: "+visit_duration+" mins.";
                   console.log(typeof  titulo_fin);
                   marker2 = new google.maps.Marker({
                     map: map,
                     position: myLatLng2,
-                    title: titulo_fin
+                    //title: titulo_fin
                   });
                   marker2.setIcon('https://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
                 }
