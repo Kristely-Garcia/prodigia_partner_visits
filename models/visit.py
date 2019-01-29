@@ -48,28 +48,31 @@ class PartnerVisit(models.Model):
     #FUNCIONES QUE SE LLAMAN DESDE JS
     ###########################################
     def visit_start(self):
-        print('visit_start ',self)
-        print('self.env.context: ',self.env.context)
-        user = self.env.user
-        print('user: ',user)
-        user_id = self.env.context.get('user_id')
+        """
+        este metodo es llamado desde el wisget de botones
+        en javascript.
+        le manda las coordenadas (lat, lng)
+        """
         lat = self.env.context.get('lat')
         lng = self.env.context.get('lng')
-        print(lat,', ',lng)
+
+        self.check_user()
         self.check_coordinates(lat, lng) 
 
         vals = {'lat1':lat,'lng1':lng,}
         return self.action_start(vals)
 
     def visit_end(self):
-        print('visit_end ',self)
-        print('self.env.context: ',self.env.context)
-        user = self.env.user
-        print('user: ',user)
-        user_id = self.env.context.get('user_id')
+        """
+        este metodo es llamado desde el wisget de botones
+        en javascript.
+        le manda las coordenadas (lat2, lng2)
+        calcula la distancia entre los 2 puntos
+        """
         lat = self.env.context.get('lat')
         lng = self.env.context.get('lng')
         distance = self.env.context.get('distance')
+        self.check_user()
         self.check_coordinates(lat, lng)        
         vals = {'lat2':lat,'lng2':lng,'distance':distance,}
         return self.action_end(vals)
@@ -86,6 +89,21 @@ class PartnerVisit(models.Model):
             raise UserError(msg)
         return True
 
+    def check_user(self):
+        """
+        verifica que el usuario que realiza la accion
+        de inicio y fin de visita
+        sea el mismo asignado como responsable 
+        de la misma
+        """
+        user = self.env.user
+        print('user: ',user)
+        if not user.id == self.user_id:
+            msg = """Solo el usuario registrado como responsable puede iniciar o finalizar
+            la visita!"""
+            raise UserError(msg)
+        return True
+
 
     ###########################################
     #FUNCIONES DE CAMPOS COMPUTADOS
@@ -99,8 +117,9 @@ class PartnerVisit(models.Model):
         se tomara como que existe discrepancia en la visita
         """
         print('_calculate_discrepancy')
-        treshold_distance = 50
+        #treshold_distance = 50
         for rec in self:
+            treshold_distance = rec.company_id and rec.company_id.treshold_distance or 50
             if rec.distance > treshold_distance:
                 rec.point_discrepancy = True
 
@@ -195,6 +214,8 @@ class PartnerVisit(models.Model):
     ###########################################
     #DEFINICION DE CAMPOS
     ###########################################
+    company_id = fields.Many2one('res.company', 'Company',
+        default=lambda self: self.env.user.company_id, required=True)
     name = fields.Char(string='Visita',
         required=True,
         default=lambda self: 'Nuevo',
@@ -238,11 +259,11 @@ class PartnerVisit(models.Model):
 
 
     #datos de comienzo de visita
-    lat1 = fields.Float(string="latitud1", digits=(6,6))
-    lng1 = fields.Float(string="longitud1", digits=(6,6))
+    lat1 = fields.Float(string="latitud1", digits=(6,6),track_visibility='onchange')
+    lng1 = fields.Float(string="longitud1", digits=(6,6),track_visibility='onchange')
 
     #datos de termino de visita
-    lat2 = fields.Float(string="latitud2", digits=(6,6))
-    lng2 = fields.Float(string="longitud2", digits=(6,6))
+    lat2 = fields.Float(string="latitud2", digits=(6,6),track_visibility='onchange')
+    lng2 = fields.Float(string="longitud2", digits=(6,6),track_visibility='onchange')
     distance = fields.Float(string="Distancia entre puntos (m)",)
     point_discrepancy = fields.Boolean(string="Discrepancia",calculate="_calculate_discrepancy",store=True)

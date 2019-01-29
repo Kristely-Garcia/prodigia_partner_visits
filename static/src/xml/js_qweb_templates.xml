@@ -1,8 +1,11 @@
 <templates> 
   <t t-name="Gmap"> 
     <div>
-      <div id="map" style="width: 1000px; height: 800px;">
+      <!-- <div id="map" style="width: 1000px; height: 800px;">
         <div id="map-canvas" style="width: 1000px; height: 800px;"/>
+      </div> -->
+      <div id="map" style="width: 80vw; height: 50vh;">
+        <div id="map-canvas" style="width: 80vw; height: 50vh;"/>
       </div>
     </div> 
   </t> 

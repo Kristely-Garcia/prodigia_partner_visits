@@ -17,6 +17,10 @@
                                         <label for="g_map_widget_api_key" string="Api key"/>
                                         <field name="g_map_widget_api_key"/>
                                     </div>
+                                    <div class="mt16">
+                                        <label for="distance_treshold" string="Distancia maxima"/>
+                                        <field name="distance_treshold"/>
+                                    </div>
                                 </div>
                             </div>
                         </div>

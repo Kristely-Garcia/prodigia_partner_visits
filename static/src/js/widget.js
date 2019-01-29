@@ -15,31 +15,29 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
         start: function(){
 
           map_canvas = this.$('#map-canvas')[0]
-          /*console.log(this)*/
           var deferred = new jQuery.Deferred(), 
           self = this;
-          /*var domain = this.field.domain;*/
+          console.log(this)
           var field_type = this.field.type;
           var domain;
           switch(field_type){
             case "many2one":
-                var partner_id = this.value.res_id;
-                domain = [['id','=',partner_id]];
+                var visit_id = this.res_id;
+                domain = [['id','=',visit_id]];
               break;
             default:
-                var line_ids = this.recordData.line_ids.data
-                var partner_ids = [];
+                var visit_ids = this.recordData.line_ids.res_ids;
+                /*var partner_ids = [];
                 for(var x=0;x<line_ids.length;x++){
                   partner_ids.push(line_ids[x].data.partner_id.data.id)
-                }
-                domain = [['id','in',partner_ids]];
+                }*/
+                domain = [['id','in',visit_ids]];
               break;
           }
           this._rpc({ 
-              /*model: this.field.relation,*/
-              model: 'res.partner', 
+              model: 'partner.visit', 
               method: 'search_read', 
-              fields: ['display_name','partner_latitude','partner_longitude'], 
+              fields: ['display_name','lat1','lng1','lat2','lng2'], 
               domain: domain,
           }) 
           .then(function(records) 
@@ -52,24 +50,33 @@ odoo.define('prodigia_partner_visits.gmap_widget', function(require){
               });
 
               for(var x=0;x<records.length;x++){
-                var lat = records[x].partner_latitude
-                var lng = records[x].partner_longitude
-                var partner_name = records[x].display_name
-                var myLatLng = {lat: lat, lng: lng};
+                var lat1 = records[x].lat1
+                var lng1 = records[x].lng1
+                var lat2 = records[x].lat2
+                var lng2 = records[x].lng2
+
+                //var partner_name = records[x].display_name
+                var myLatLng1 = {lat: lat1, lng: lng1};
+                var myLatLng2 = {lat: lat2, lng: lng2};
                 
                 
-                // Create a marker and set its position.
+                //punto inicio de visita
                 var marker = new google.maps.Marker({
                   map: map,
-                  position: myLatLng,
-                  title: partner_name
+                  position: myLatLng1,
+                  //title: partner_name
+                });
+                //punto final
+                var marker2 = new google.maps.Marker({
+                  map: map,
+                  position: myLatLng2,
+                  //title: partner_name
                 });
               }
               deferred.resolve(); 
           });
 
           return jQuery.when( 
-              /*this._super.apply(this, arguments), */
               deferred 
           ); 
         },

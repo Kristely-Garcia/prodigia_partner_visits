@@ -72,6 +72,11 @@ var LocationButtonsWidget = AbstractField.extend({
     //--------------------------------------------------------------------------
     // Handlers
     //--------------------------------------------------------------------------
+    /*
+    se utilizara una funcion callback,
+    para obtener los valores de lat y lng
+    del metodo asincrono navigator.geolocation.getCurrentPosition
+    */
     _onClickButton: function (event) {
         console.log("_onClickButton");
         //var self = this;
@@ -145,8 +150,8 @@ var LocationButtonsWidget = AbstractField.extend({
           lat: 29.09737,
           lng: -111.02102
         };
-        callback(pos,self);*/
-
+        callback(pos,self);
+        return true;*/
         /*lat: 29.09737,
         lng: -111.02102*/
 
