@@ -15,7 +15,7 @@
         <button
           class="btn btn-xs btn-primary js_get_current_location pull-left"
           t-att-visit-id="visit_id"
-          style="margin-top:5px; margin-bottom:5px;">
+          style="border-radius:25px;height:70px;margin-top:5px; margin-bottom:5px;">
           Comenzar Visita
         </button>
     </t>
@@ -23,7 +23,7 @@
         <button
           class="btn btn-xs btn-primary js_get_current_location2 pull-left"
           t-att-visit-id="visit_id"
-          style="margin-top:5px; margin-bottom:5px;">
+          style="border-radius:25px;height:70px;margin-top:5px; margin-bottom:5px;">
           Finalizar Visita
         </button>
     </t>

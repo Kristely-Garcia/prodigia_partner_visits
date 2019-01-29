@@ -8,6 +8,7 @@
         <record id="partner_visit_admin" model="res.groups"> 
             <field name="name">Admin de visitas</field>
             <field name="category_id" ref="base.module_category_sales_management"/>
+            <field name="implied_ids" eval="[(4, ref('prodigia_partner_visits.partner_visit_user'))]"/>
         </record>
     </data>
 </openerp>

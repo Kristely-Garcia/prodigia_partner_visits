@@ -110,6 +110,23 @@ class PartnerVisit(models.Model):
     #FUNCIONES DE CAMPOS COMPUTADOS
     ###########################################
     @api.multi
+    @api.depends('partner_id')
+    def _compute_location_partner(self):
+        """
+        se actualizan las coordenadas de ubicacion de 
+        cliente cuando se cambia de cliente
+        """
+        print('_compute_location_partner')
+        #treshold_distance = 50
+        for rec in self:
+            if rec.partner_id:
+                rec.lat_partner = rec.partner_id.partner_latitude or 0.0
+                rec.lng_partner = rec.partner_id.partner_longitude or 0.0
+            else:
+                rec.lat_partner = False
+                rec.lng_partner = False
+
+    @api.multi
     @api.depends('distance')
     def _calculate_discrepancy(self):
         """
@@ -120,9 +137,28 @@ class PartnerVisit(models.Model):
         print('_calculate_discrepancy')
         #treshold_distance = 50
         for rec in self:
-            treshold_distance = rec.company_id and rec.company_id.treshold_distance or 50
-            if rec.distance > treshold_distance:
+            distance_treshold = rec.company_id and rec.company_id.distance_treshold or 50
+            if rec.distance > distance_treshold and rec.state not in ('nuevo'):
                 rec.point_discrepancy = True
+
+    @api.multi
+    @api.depends('partner_id')
+    def _compute_partner_display_name(self):
+        """
+        se guarda el nombre del cliente
+        en un campo de texto plano
+        para ser usado por el widget de mapa
+        factilmente,
+        se actualiza el nombre cuando se actualiza
+        el cliente
+        """
+        print('_compute_partner_display_name')
+        #treshold_distance = 50
+        for rec in self:
+            if rec.partner_id:
+                rec.partner_display_name = rec.partner_id.display_name
+            else:
+                rec.partner_display_name = ''
 
     @api.multi
     def _compute_partner_id_map(self):
@@ -136,6 +172,7 @@ class PartnerVisit(models.Model):
             if rec.partner_id:
                 rec.partner_id_map = rec.partner_id.id
     @api.multi
+    @api.depends('date','end_date')
     def _compute_visit_duration(self):
         """
         OBTIENE DIFERENCIA ENTRE FECHA Y FECHA FINAL
@@ -160,6 +197,11 @@ class PartnerVisit(models.Model):
         if values.get('name', 'Nuevo') == 'Nuevo':
             values['name'] = self.env['ir.sequence'].next_by_code('partner.visit') or 'Nuevo'
         record = super(PartnerVisit, self).create(values)
+
+        #se guardan las coordenadas del partner
+        # record.lat_partner = record.partner_id.partner_latitude or 0.0
+        # record.lng_partner = record.partner_id.partner_longitude or 0.0
+        #record.partner_display_name = record.partner_id.display_name or ''
         return record
 
     ###########################################
@@ -215,12 +257,16 @@ class PartnerVisit(models.Model):
     ###########################################
     #DEFINICION DE CAMPOS
     ###########################################
+    
     company_id = fields.Many2one('res.company', 'Company',
         default=lambda self: self.env.user.company_id, required=True)
     name = fields.Char(string='Visita',
         required=True,
         default=lambda self: 'Nuevo',
         readonly=True)
+    partner_display_name = fields.Char(string='Nombre de cliente',
+        compute="_compute_partner_display_name",
+        store=True)
     user_id = fields.Many2one('res.users',
         string='Vendedor',
         required=True,
@@ -243,7 +289,8 @@ class PartnerVisit(models.Model):
         track_visibility='onchange',
         readonly=True)
     visit_duration = fields.Float(string='Duracion(mins)',
-        compute='_compute_visit_duration')
+        compute='_compute_visit_duration',
+        store=True)
     visit_type = fields.Selection([
         ('prospector','Prospector'),
         ('cortesia','Cortesia'),
@@ -258,13 +305,33 @@ class PartnerVisit(models.Model):
     #usado para botones js
     begin_visit_button_widget = fields.Char(string="Registro de visita")
 
+    #datos de ubicacion de partner
+    lat_partner = fields.Float(string="latitud de cliente",
+        digits=(6,6),
+        compute="_compute_location_partner",
+        store=True,
+        track_visibility='onchange')
+    lng_partner = fields.Float(string="longitud de cliente",
+        digits=(6,6),
+        store=True,
+        compute="_compute_location_partner",
+        track_visibility='onchange')
 
     #datos de comienzo de visita
-    lat1 = fields.Float(string="latitud1", digits=(6,6),track_visibility='onchange')
-    lng1 = fields.Float(string="longitud1", digits=(6,6),track_visibility='onchange')
+    lat1 = fields.Float(string="latitud1",
+        digits=(6,6),
+        track_visibility='onchange')
+    lng1 = fields.Float(string="longitud1",
+        digits=(6,6),
+        track_visibility='onchange')
 
     #datos de termino de visita
-    lat2 = fields.Float(string="latitud2", digits=(6,6),track_visibility='onchange')
-    lng2 = fields.Float(string="longitud2", digits=(6,6),track_visibility='onchange')
+    lat2 = fields.Float(string="latitud2",
+        digits=(6,6),
+        track_visibility='onchange')
+    lng2 = fields.Float(string="longitud2",
+        digits=(6,6),track_visibility='onchange')
     distance = fields.Float(string="Distancia entre puntos (m)",)
-    point_discrepancy = fields.Boolean(string="Discrepancia",calculate="_calculate_discrepancy",store=True)
+    point_discrepancy = fields.Boolean(string="Discrepancia",
+        compute="_calculate_discrepancy",
+        store=True)

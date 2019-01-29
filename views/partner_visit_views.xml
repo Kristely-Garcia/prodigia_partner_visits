@@ -27,9 +27,8 @@
                         statusbar_visible="nuevo,proceso,hecho"/>
                 </header>
                 <sheet string="Visitas" name='main_view'>
-                    <group string="Visitas">
-                        <h1><field name="name"/></h1>
-                    </group>
+                    <field name="begin_visit_button_widget" widget="location_buttons_widget"/>
+                    <h1><field name="name"/></h1>
 
                     <group colspan="4">
                         <group col="2">
@@ -41,7 +40,6 @@
                                 attrs="{'readonly':[('state','not in',['nuevo',])]}"/>
                         </group>
                         <group col="2">
-                            <field name="begin_visit_button_widget" widget="location_buttons_widget"/>
                             <field name="date"/>
                             <field name="end_date"/>
                             <field name="visit_duration"/>
@@ -59,6 +57,15 @@
                                 <field name="distance"
                                     attrs="{'readonly':[('state','in',['hecho','cancelado'])], 'invisible':[('state','not in',['hecho','cancelado'])]}"/>
                             </group>
+
+                            <group colspan="4">
+                                <group col="2" string="Datos de ubicacion de Cliente">
+                                    <field name="partner_display_name" readonly='1'/>
+                                    <field name="lat_partner" readonly='1'/>
+                                    <field name="lng_partner" readonly='1'/>
+                                </group>
+                            </group>
+
                             <group colspan="4">
                                 <group col="2" string="Inicio de visita">
                                     <field name="lat1" readonly='1'/>
@@ -172,6 +179,7 @@
 
         <!-- MENUS -->
         <menuitem name="Visitas" id="menu_partner_visit_submenu" parent="sale.sale_menu_root" sequence="5"/>
-        <menuitem name="Visitas a cliente" id="menu_partner_visit_action" parent="menu_partner_visit_submenu" action="partner_visit_action" sequence="1" />
+        <menuitem name="Visitas a cliente" id="menu_partner_visit_action" parent="menu_partner_visit_submenu" action="partner_visit_action" sequence="1"
+            groups="prodigia_partner_visits.partner_visit_user"/>
     </data>
 </odoo>

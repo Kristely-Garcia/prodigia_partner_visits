@@ -44,7 +44,10 @@
 
 
         <!-- MENUS -->
-        <menuitem name="Reporte de visitas" id="action_visit_user_report_wizard_menu" parent="menu_partner_visit_submenu" action="action_visit_user_report_wizard" sequence="2" />
+        <menuitem name="Reporte de visitas" id="action_visit_user_report_wizard_menu" parent="menu_partner_visit_submenu"
+            action="action_visit_user_report_wizard"
+            groups="prodigia_partner_visits.partner_visit_admin"
+            sequence="2" />
 
 
     </data>
