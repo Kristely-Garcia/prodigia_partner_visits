@@ -316,7 +316,7 @@ class PartnerVisit(models.Model):
         store=True)
     visit_type = fields.Selection([
         ('prospector','Prospector'),
-        ('cortesia','Cortesia'),
+        ('seguimiento','Seguimiento'),
         ],string='Tipo',required=True,track_visibility='onchange')
     state = fields.Selection([
         ('nuevo','Nueva'),
